@@ -1,0 +1,29 @@
+; 1. 動的IPアドレスを取得
+; 1-1. バッチを実行し、テキストファイルにIPを書き込む
+exec 'cmd /c c:\Users\takafuji\Desktop\ssh\myaws\get_ec2_ip.bat [target-ec2-name] '
+; 1-2. ファイルからIPを取り出し変数にセット
+pause 3
+
+fileopen FH 'ip.txt' 0 0
+filereadln FH HOST_ADDR
+fileclose FH
+
+; (2)ユーザ名／秘密鍵を設定
+USER_NAME = 'ec2-user'
+;getenv 'HOME' KEY_FILE
+strconcat KEY_FILE '[/path/to/keyfile]'
+
+; (3)コマンド組立て 
+COMMAND = HOST_ADDR 
+strconcat COMMAND ':22 /ssh /2 /auth=publickey /user=' 
+strconcat COMMAND USER_NAME 
+strconcat COMMAND ' /keyfile="' 
+
+strconcat COMMAND KEY_FILE
+; 設定ファイルを用意しているならここでセット
+;strconcat COMMAND '" /F=SETTING.INI' 
+
+; (4)サーバへ接続 
+connect COMMAND
+
+end
